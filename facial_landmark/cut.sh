@@ -1,0 +1,1 @@
+for dir in $(ls -d */);do cd $dir; ffmpeg -i vid.avi -qscale:v 1 -f image2 annot/%06d.jpg; cd ..; done
