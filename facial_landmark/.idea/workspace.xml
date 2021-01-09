@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="655c706a-c4b1-41e5-b869-79d98fd386b7" name="Default Changelist" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="Peppa_Pig_Face_Engine-master" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectId" id="1USR0vWYJhvrcS2Uqbz5cFLdFVb" />
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="Peppa_Pig_Face_Engine-master" is-module-sdk="true">
+        <option name="myUseModuleSdk" value="true" />
+        <option name="myModuleName" value="Peppa_Pig_Face_Engine-master" />
+      </console-settings>
+    </option>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="655c706a-c4b1-41e5-b869-79d98fd386b7" name="Default Changelist" comment="" />
+      <created>1575347790061</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1575347790061</updated>
+      <workItem from="1575347810658" duration="6595000" />
+      <workItem from="1575356133786" duration="6407000" />
+      <workItem from="1575366916612" duration="6577000" />
+      <workItem from="1575377870711" duration="2872000" />
+      <workItem from="1575435498653" duration="10029000" />
+      <workItem from="1575453411110" duration="9366000" />
+      <workItem from="1575463425872" duration="1893000" />
+      <workItem from="1575465423924" duration="1215000" />
+      <workItem from="1575514666561" duration="19311000" />
+      <workItem from="1575539367190" duration="8530000" />
+      <workItem from="1575868312587" duration="14870000" />
+      <workItem from="1575964424302" duration="16053000" />
+      <workItem from="1575981935027" duration="21000" />
+      <workItem from="1575982072183" duration="6577000" />
+      <workItem from="1576140952217" duration="2219000" />
+      <workItem from="1576326002588" duration="4835000" />
+      <workItem from="1576555942504" duration="4750000" />
+      <workItem from="1577613225054" duration="53000" />
+      <workItem from="1577967264329" duration="304000" />
+      <workItem from="1582616990820" duration="16000" />
+      <workItem from="1582617878766" duration="694000" />
+      <workItem from="1608913286854" duration="398000" />
+      <workItem from="1608964232591" duration="18000" />
+      <workItem from="1608970896994" duration="2544000" />
+      <workItem from="1609039420594" duration="3403000" />
+      <workItem from="1609161148443" duration="1894000" />
+      <workItem from="1609211412137" duration="2519000" />
+      <workItem from="1609336338663" duration="2837000" />
+      <workItem from="1609395270534" duration="141000" />
+      <workItem from="1610190592187" duration="46000" />
+      <workItem from="1610197960118" duration="977000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+</project>
