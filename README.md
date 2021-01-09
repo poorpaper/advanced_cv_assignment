@@ -37,7 +37,7 @@ ID:2020244123
 
 人脸检测（mini-DSFD）：
   1. 下载WIDER FACE数据集 http://shuoyang1213.me/WIDERFACE/
-     然后解压WIDER_train, WIDER_val and wider_face_split 到 ./WIDER, 接着运行
+     然后解压WIDER_train, WIDER_val 和 wider_face_split 到 ./WIDER, 接着运行
      ```python prepare_wider_data.py```
 
   2. 运行 ```python train.py```来训练
