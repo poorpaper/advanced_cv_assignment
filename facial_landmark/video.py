@@ -10,7 +10,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import *
 
-from openni import openni2
 import numpy as np
 import cv2
 import time
@@ -243,35 +242,15 @@ class Display:
         self.reset_state("Video")
 
     def use_camera_or_video(self, video_path_or_camid):
-        if self.current_mode == "Kinect":
-            if not self.timer_camera.isActive():
-                try:
-                    openni2.initialize()  # can also accept the path of the OpenNI redistribution
-                    dev = openni2.Device.open_any()
-                    print(dev.get_device_info())
-
-                    self.depth_stream = dev.create_depth_stream()
-                    self.color_stream = dev.create_color_stream()
-
-                    self.depth_stream.start()
-                    self.color_stream.start()
-                except OpenNIError:
-                    self.ui.pushButton_4.setText("Start")
-                    msg = QtWidgets.QMessageBox.warning(self.mainWnd, u"Warning", u"Kinect连接失败，请查验后重启本程序",
+        self.cap = cv2.VideoCapture(video_path_or_camid)
+        if not self.timer_camera.isActive():
+            flag = self.cap.open(video_path_or_camid)
+            if flag == False:
+                msg = QtWidgets.QMessageBox.warning(self.mainWnd, u"Warning", u"请检测相机与电脑是否连接正确",
                                                         buttons=QtWidgets.QMessageBox.Ok,
                                                         defaultButton=QtWidgets.QMessageBox.Ok)
-                else:
-                    self.timer_camera.start(25)
-        else:
-            self.cap = cv2.VideoCapture(video_path_or_camid)
-            if not self.timer_camera.isActive():
-                flag = self.cap.open(video_path_or_camid)
-                if flag == False:
-                    msg = QtWidgets.QMessageBox.warning(self.mainWnd, u"Warning", u"请检测相机与电脑是否连接正确",
-                                                        buttons=QtWidgets.QMessageBox.Ok,
-                                                        defaultButton=QtWidgets.QMessageBox.Ok)
-                else:
-                    self.timer_camera.start(25)
+            else:
+                self.timer_camera.start(25)
 
     def show_camera(self):
         if self.current_mode == "Kinect":
