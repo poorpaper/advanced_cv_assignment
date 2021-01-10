@@ -13,7 +13,7 @@ ID:2020244123
 
 + PyQt5
 
-+ tensorflow==2.0.0
++ tensorflow-gpu==2.0.0
 
 + tensorpack==0.9.9
 
