@@ -61,7 +61,6 @@ class Display:
         self.timer_camera.timeout.connect(self.show_camera)
         ui.actionVideo.triggered.connect(self.use_video)
         ui.actionCamera.triggered.connect(self.use_camera)
-        # ui.actionKinect.triggered.connect(self.use_kinect)
         ui.actionExit.triggered.connect(self.mainWnd.close)
         ui.actionPictures.triggered.connect(self.use_images)
         ui.pushButton_4.clicked.connect(self.switch)
@@ -89,7 +88,7 @@ class Display:
     def create_json(self, landmarks, image_name=None, dpt=None):
         dic = {}
         t = time.time()
-        if dpt is not None:  # 说明是Kinect模式
+        if dpt is not None:
             depth = []
             for face_index in range(landmarks.shape[0]):
                 for landmarks_index in range(landmarks[face_index].shape[0]):
@@ -123,7 +122,7 @@ class Display:
                 json_file.write(json.dumps(dic))
 
     def control_button_disabled(self):
-        if self.current_mode == "Camera" or self.current_mode == "Kinect":
+        if self.current_mode == "Camera":
             self.ui.pushButton.setDisabled(True)
             self.ui.pushButton_2.setDisabled(False)
         elif self.current_mode == "Video":
@@ -164,13 +163,6 @@ class Display:
                     self.timer_camera.start(25)
                 else:
                     self.use_camera_or_video(camid)
-
-            elif self.current_mode == "Kinect":
-                self.ui.pushButton_4.setText("Pause")
-                if self.playing_states:
-                    self.timer_camera.start(25)
-                else:
-                    self.use_camera_or_video(camid)
         else:
             self.timer_camera.stop()
             # self.cap.release()
@@ -185,10 +177,6 @@ class Display:
         if self.current_mode == "Images":
              str = str + " Images read from: " + self.image_or_video_from_path + "\n"
              str = str + " Images and result with 68 landmarks will be saved to: " + self.image_to_path + "\n"
-
-        elif self.current_mode == "Kinect":
-            str = str + " Attention: Only distance between Kinect and objects in [500, 4500] " + \
-                  "can be caught by Kinect." + "\n"
 
         elif self.current_mode == "Video":
             str = str + " Video read from: " + self.image_or_video_from_path + "\n"
@@ -224,9 +212,6 @@ class Display:
 
         self.reset_state("Images", text="No Signal")
 
-    # def use_kinect(self):
-    #     self.reset_state("Kinect")
-
     def use_camera(self):
         self.reset_state("Camera")
 
@@ -247,111 +232,56 @@ class Display:
             flag = self.cap.open(video_path_or_camid)
             if flag == False:
                 msg = QtWidgets.QMessageBox.warning(self.mainWnd, u"Warning", u"请检测相机与电脑是否连接正确",
-                                                        buttons=QtWidgets.QMessageBox.Ok,
-                                                        defaultButton=QtWidgets.QMessageBox.Ok)
+                                                    buttons=QtWidgets.QMessageBox.Ok,
+                                                    defaultButton=QtWidgets.QMessageBox.Ok)
             else:
                 self.timer_camera.start(25)
 
     def show_camera(self):
-        if self.current_mode == "Kinect":
-            self.playing_states = True
-            if self.playing_states:
-                frame = self.depth_stream.read_frame()
-                dframe_data = np.array(frame.get_buffer_as_triplet()).reshape([480, 640, 2])
-                dpt1 = np.asarray(dframe_data[:, :, 0], dtype='float32')
-                dpt2 = np.asarray(dframe_data[:, :, 1], dtype='float32')
-                dpt2 *= 255
-                dpt = dpt1 + dpt2
+        self.playing_states, image = self.cap.read()
+        if self.playing_states:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            '''
+            scale_x = image.shape[1] / 480
+            scale_y = image.shape[0] / 360
+            scale = min(scale_x, scale_y)
+            image = cv2.resize(image, None, fx=scale, fy=scale)
+            '''
+            show = image.copy()
+            start = time.time()
 
-                # 显示RGB图像
-                cframe = self.color_stream.read_frame()
-                cframe_data = np.array(cframe.get_buffer_as_triplet()).reshape([480, 640, 3])
+            boxes, landmarks, states = facer.run(image)
+            duration = time.time() - start
+            if duration == 0:
+                duration = 0.01
+            print('one frame cost %f s' % duration)
 
-                R = cframe_data[:, :, 0]
-                G = cframe_data[:, :, 1]
-                B = cframe_data[:, :, 2]
-                cframe_data = cv2.merge([R, G, B])
+            self.per_image_cost = duration
+            self.fps = 1.0 / duration
 
-                start = time.time()
-                boxes, landmarks, states = facer.run(cframe_data)
-                duration = time.time() - start
-                if duration == 0:
-                    duration = 0.01
-                print('one frame cost %f s' % duration)
+            for face_index in range(landmarks.shape[0]):
 
-                self.per_image_cost = duration
-                self.fps = 1.0 / duration
+                for landmarks_index in range(landmarks[face_index].shape[0]):
+                    x_y = landmarks[face_index][landmarks_index]
+                    cv2.circle(show, (int(x_y[0]), int(x_y[1])), 2, (222, 222, 222), -1)
 
-                for face_index in range(landmarks.shape[0]):
-                    for landmarks_index in range(landmarks[face_index].shape[0]):
-                        x_y = landmarks[face_index][landmarks_index]
-                        cv2.circle(cframe_data, (int(x_y[0]), int(x_y[1])), 2, (222, 222, 222), -1)
+            if self.ui.checkBox.checkState():
+                self.create_json(landmarks)
 
-                if self.ui.checkBox.checkState():
-                    self.create_json(landmarks, dpt=dpt)
-
-                processed_image = QtGui.QImage(cframe_data.data, cframe_data.shape[1], cframe_data.shape[0],
-                                               QtGui.QImage.Format_RGB888)
-                temp_pix = QtGui.QPixmap.fromImage(processed_image).scaled(QSize(640, 480),
-                                                                           aspectRatioMode=Qt.KeepAspectRatio)
-                self.ui.screen1.setPixmap(temp_pix)
-
-                depth_image = QtGui.QImage(dpt.data, dpt.shape[1], dpt.shape[0], QtGui.QImage.Format_ARGB32)
-                temp_pix = QtGui.QPixmap.fromImage(depth_image).scaled(QSize(640, 480),
+            processed_image = QtGui.QImage(show.data, show.shape[1], show.shape[0], QtGui.QImage.Format_RGB888)
+            temp_pix = QtGui.QPixmap.fromImage(processed_image).scaled(QSize(640, 480),
                                                                        aspectRatioMode=Qt.KeepAspectRatio)
-                self.ui.screen2.setPixmap(temp_pix)
+            self.ui.screen2.setPixmap(temp_pix)
 
-                self.show_info(before_start=False)
-
-            else:
-                self.timer_camera.stop()
-                self.ui.pushButton_4.setText("Start")
+            origin_image = QtGui.QImage(image.data, image.shape[1], image.shape[0], QtGui.QImage.Format_RGB888)
+            temp_pix = QtGui.QPixmap.fromImage(origin_image).scaled(QSize(640, 480),
+                                                                    aspectRatioMode=Qt.KeepAspectRatio)
+            self.ui.screen1.setPixmap(temp_pix)
+            self.show_info(before_start=False)
 
         else:
-            self.playing_states, image = self.cap.read()
-            if self.playing_states:
-                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                '''
-                scale_x = image.shape[1] / 480
-                scale_y = image.shape[0] / 360
-                scale = min(scale_x, scale_y)
-                image = cv2.resize(image, None, fx=scale, fy=scale)
-                '''
-                show = image.copy()
-                start = time.time()
-
-                boxes, landmarks, states = facer.run(image)
-                duration = time.time() - start
-                if duration == 0:
-                    duration = 0.01
-                print('one frame cost %f s' % duration)
-
-                self.per_image_cost = duration
-                self.fps = 1.0 / duration
-
-                for face_index in range(landmarks.shape[0]):
-
-                    for landmarks_index in range(landmarks[face_index].shape[0]):
-                        x_y = landmarks[face_index][landmarks_index]
-                        cv2.circle(show, (int(x_y[0]), int(x_y[1])), 2, (222, 222, 222), -1)
-
-                if self.ui.checkBox.checkState():
-                    self.create_json(landmarks)
-
-                processed_image = QtGui.QImage(show.data, show.shape[1], show.shape[0], QtGui.QImage.Format_RGB888)
-                temp_pix = QtGui.QPixmap.fromImage(processed_image).scaled(QSize(640, 480),
-                                                                           aspectRatioMode=Qt.KeepAspectRatio)
-                self.ui.screen2.setPixmap(temp_pix)
-
-                origin_image = QtGui.QImage(image.data, image.shape[1], image.shape[0], QtGui.QImage.Format_RGB888)
-                temp_pix = QtGui.QPixmap.fromImage(origin_image).scaled(QSize(640, 480),
-                                                                        aspectRatioMode=Qt.KeepAspectRatio)
-                self.ui.screen1.setPixmap(temp_pix)
-                self.show_info(before_start=False)
-
-            else:
-                self.timer_camera.stop()
-                self.ui.pushButton_4.setText("Start")
+            self.timer_camera.stop()
+            self.ui.pushButton_4.setText("Start")
 
     def images(self, from_path, dst_path):
         image_list = os.listdir(from_path)
